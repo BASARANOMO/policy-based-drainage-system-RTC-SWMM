@@ -52,13 +52,12 @@ class PolicyGradientAgent:
 
     # Train the policy
     @tf.function
-    def train_policy(
-        self, observation_buffer, action_buffer, return_buffer
-    ):
+    def train_policy(self, observation_buffer, action_buffer, return_buffer):
         with tf.GradientTape() as tape:  # Record operations for automatic differentiation.
             logits = self.policy(observation_buffer)
             log_probs = self.logprobabilities(logits, action_buffer)
             policy_loss = -tf.reduce_sum(log_probs * return_buffer)
         policy_grads = tape.gradient(policy_loss, self.policy.trainable_variables)
-        self.optimizer.apply_gradients(zip(policy_grads, self.policy.trainable_variables))
-        
+        self.optimizer.apply_gradients(
+            zip(policy_grads, self.policy.trainable_variables)
+        )
