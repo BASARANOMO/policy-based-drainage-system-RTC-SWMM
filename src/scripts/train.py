@@ -19,8 +19,7 @@ nowtime = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M")
 epoch_cnt = int(sys.argv[2])
 first_rain_event_num = int(sys.argv[3])  # 1
 final_rain_event_num = int(sys.argv[4])  # 5
-low_depth_penalty = eval(sys.argv[5])
-result_folder_name = f"{sys.argv[1]}_{nowtime}_rain_{first_rain_event_num}_{final_rain_event_num}_episode_{epoch_cnt}_low_penalty_{low_depth_penalty}"
+result_folder_name = f"{sys.argv[1]}_{nowtime}_rain_{first_rain_event_num}_{final_rain_event_num}_episode_{epoch_cnt}"
 
 training_cases_path = r"../../data/"
 training_cases_name = r"rain_case"
@@ -121,20 +120,21 @@ for epoch in range(epoch_cnt):
     num_opened_pumps_2 = 0
 
     # Init state
-    obs_state = np.zeros(observation_dimensions)
-    obs_state[0] = swmm_model.getNodeResults(node[0], 5)
-    obs_state[1] = swmm_model.getNodeResults(node[1], 5)
+    obs_state = np.zeros((1, observation_dimensions))
+    obs_state[0][0] = swmm_model.getNodeResult(node[0], 5)
+    obs_state[0][1] = swmm_model.getNodeResult(node[1], 5)
     # Rain prediction in 30 mins
     for i in range(2, 8):
-        obs_state[i] = rain[step + i - 2]
-    obs_state[8] = num_opened_pumps_1
-    obs_state[9] = num_opened_pumps_2
+        obs_state[0][i] = rain[i - 2]
+    obs_state[0][8] = num_opened_pumps_1
+    obs_state[0][9] = num_opened_pumps_2
 
     for step in range(steps_per_epoch):
         # Take action
         if step > 0:
             last_step_action = action
-        action = pg_agent.sample_action(obs_state)
+        logits, action = pg_agent.sample_action(obs_state)
+        action = action[0]
 
         num_opened_pumps_1 = 0
         num_opened_pumps_2 = 0
@@ -151,17 +151,17 @@ for epoch in range(epoch_cnt):
             terminal = True
 
         # observe the new state
-        obs_state_new = np.zeros(observation_dimensions)
-        obs_state_new[0] = swmm_model.getNodeResults(node[0], 5)
-        obs_state_new[1] = swmm_model.getNodeResults(node[1], 5)
+        obs_state_new = np.zeros((1, observation_dimensions))
+        obs_state_new[0][0] = swmm_model.getNodeResult(node[0], 5)
+        obs_state_new[0][1] = swmm_model.getNodeResult(node[1], 5)
         for i in range(2, 8):
-            obs_state_new[i] = rain[step % rain_duration + i - 2]
-        obs_state_new[8] = num_opened_pumps_1
-        obs_state_new[9] = num_opened_pumps_2
+            obs_state_new[0][i] = rain[step % rain_duration + i - 2]
+        obs_state_new[0][8] = num_opened_pumps_1
+        obs_state_new[0][9] = num_opened_pumps_2
 
         # reward
         reward = reward_function(
-            [obs_state_new[0], obs_state_new[1]],
+            [obs_state_new[0][0], obs_state_new[0][1]],
             target_depths=target_depths,
             depth_penalty=depth_penalty,
             depth_advantage=depth_advantage,
@@ -205,11 +205,11 @@ for epoch in range(epoch_cnt):
     # Train
     pg_agent.train_policy(observation_buffer, action_buffer, return_buffer)
 
-    print(f"Epoch: {epoch + 1}, mean return: {sum_return / num_episode}")
+    print(f"Epoch: {epoch + 1}, mean return: {sum_return / num_episode / rain_duration}")
     if current_rain_event_num in mean_return_per_epoch:
-        mean_return_per_epoch[current_rain_event_num].append(np.mean(sum_return / num_episode))
+        mean_return_per_epoch[current_rain_event_num].append(sum_return / num_episode / rain_duration)
     else:
-        mean_return_per_epoch[current_rain_event_num] = [np.mean(sum_return / num_episode)]
+        mean_return_per_epoch[current_rain_event_num] = [sum_return / num_episode / rain_duration]
 
 # save trained models
 pg_agent.save_policy_weights(ckpt_path + "node_" + node_controlled[0] + "_policy_final.h5")

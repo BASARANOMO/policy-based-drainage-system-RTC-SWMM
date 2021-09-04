@@ -1,6 +1,7 @@
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
+from tensorflow.keras import activations
 
 
 class PolicyGradientAgent:
@@ -23,7 +24,7 @@ class PolicyGradientAgent:
         self.policy_lr = policy_lr
         self.optimizer = optimizer(learning_rate=self.policy_lr)
 
-    def build_default_policy(self, list_hidden_sizes=[64, 64, 32], activation=tf.relu):
+    def build_default_policy(self, list_hidden_sizes=[64, 64, 32], activation=activations.relu):
         observation_input = keras.Input(
             shape=(self.observation_dimensions,), dtype=tf.float32
         )
