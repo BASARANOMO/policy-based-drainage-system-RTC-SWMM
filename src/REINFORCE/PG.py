@@ -37,6 +37,9 @@ class PolicyGradientAgent:
 
     def save_policy_weights(self, path):
         self.policy.save_weights(path)
+    
+    def set_policy_weights(self, path):
+        self.policy.load_weights(path)
 
     def logprobabilities(self, logits, a):
         # Compute the log-probabilities of taking actions a by using the logits (i.e. the output of the actor)
