@@ -53,8 +53,8 @@ depth_advantage = [20, 20]
 energy_coeff = [-100]
 safety_coeff = [-10]
 k_coeff1 = [0.8, 0.1, 0.1]
-k_coeff2 = [1.0, 1.0, 1.0]
-k_coeff2 = [x / 3 for x in k_coeff2]
+k_coeff2 = [0.2, 0.4, 0.4]
+#k_coeff2 = [x / 3 for x in k_coeff2]
 
 # SWMM params
 rain_duration = 72  # 6hours
