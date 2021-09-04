@@ -16,7 +16,7 @@ from utils.rewards import reward_3obj_lowdepthpenalty as reward_function
 
 # Model
 model_path = (
-    f"../../results/training/test_pg_2021-09-04-17-53_rain_1_5_episode_3000_low_depth_penalty_True/"
+    f"../../results/training/test_pg_244_2021-09-04-21-27_rain_1_5_episode_3000_low_depth_penalty_True/"
     + "trained_models/ckpt/node_ChengXi_policy_final.h5"
 )
 
