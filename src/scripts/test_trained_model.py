@@ -113,7 +113,7 @@ buffer = Buffer(
 
 # Agent
 pg_agent = PolicyGradientAgent(observation_dimensions, action_dimensions, buffer)
-pg_agent.load_weights(model_path)
+pg_agent.set_policy_weights(model_path)
 starttime = datetime.datetime.now()
 
 # Test
@@ -269,7 +269,7 @@ plt.xlabel("Timestep")
 plt.ylabel("Depth (m)")
 plt.xlim(0, 72)
 plt.title("Rain event: " + str(rain_event))
-#plt.savefig(save_depth_fig_path)
+plt.savefig(save_depth_fig_path)
 if show_plt_flag:
     plt.show()
 
@@ -283,6 +283,6 @@ plt.xlabel("Timestep")
 plt.ylabel("Number of opened pumps")
 plt.xlim(0, 72)
 plt.title("Rain event: " + str(rain_event))
-#plt.savefig(save_pumps_fig_path)
+plt.savefig(save_pumps_fig_path)
 if show_plt_flag:
     plt.show()
