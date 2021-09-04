@@ -12,14 +12,15 @@ import matplotlib.pyplot as plt
 from REINFORCE.PG import PolicyGradientAgent
 from utils.memory_buffer import Buffer
 from utils.rain_generator import rain_generation
-from utils.rewards import reward_basic
+from utils.rewards import reward_3obj_lowdepthpenalty as reward_function
 
 # Pathes
 nowtime = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M")
 epoch_cnt = int(sys.argv[2])
 first_rain_event_num = int(sys.argv[3])  # 1
 final_rain_event_num = int(sys.argv[4])  # 5
-result_folder_name = f"{sys.argv[1]}_{nowtime}_rain_{first_rain_event_num}_{final_rain_event_num}_episode_{epoch_cnt}"
+low_depth_penalty = eval(sys.argv[5])
+result_folder_name = f"{sys.argv[1]}_{nowtime}_rain_{first_rain_event_num}_{final_rain_event_num}_episode_{epoch_cnt}_low_depth_penalty_{low_depth_penalty}"
 
 training_cases_path = r"../../data/"
 training_cases_name = r"rain_case"
@@ -41,10 +42,19 @@ if not os.path.exists(ckpt_path):
 save_model_freq = 2000
 
 # reward function def
-reward_function = reward_basic
 target_depths = [3.4, 4.7]
+low_target_depths = [1, 1]
 depth_penalty = [-30, -100]
-depth_advantage = [0, 0]
+if low_depth_penalty:
+    low_depth_penalty = [30, 100]
+else:
+    low_depth_penalty = [0, 0]
+depth_advantage = [20, 20]
+energy_coeff = [-100]
+safety_coeff = [-10]
+k_coeff1 = [0.8, 0.1, 0.1]
+k_coeff2 = [1.0, 1.0, 1.0]
+k_coeff2 = [x / 3 for x in k_coeff2]
 
 # SWMM params
 rain_duration = 72  # 6hours
@@ -160,11 +170,27 @@ for epoch in range(epoch_cnt):
         obs_state_new[0][9] = num_opened_pumps_2
 
         # reward
-        reward = reward_function(
+        if (
+            obs_state_new[0][0] >= target_depths[0]
+            or obs_state_new[0][1] >= target_depths[1]
+            or np.sum(obs_state_new[0][2:8]) >= 20
+        ):
+            k_coeff = k_coeff1
+        else:
+            k_coeff = k_coeff2
+        reward, reward_depth, reward_energy, reward_safety = reward_function(
             [obs_state_new[0][0], obs_state_new[0][1]],
+            action_list,
+            action,
+            last_step_action,
             target_depths=target_depths,
+            low_target_depths=low_target_depths,
             depth_penalty=depth_penalty,
+            low_depth_penalty=low_depth_penalty,
             depth_advantage=depth_advantage,
+            energy_coeff=energy_coeff,
+            safety_coeff=safety_coeff,
+            k_coeff=k_coeff,
         )
         episode_return += reward
 
@@ -173,6 +199,7 @@ for epoch in range(epoch_cnt):
 
         # state transition
         obs_state = obs_state_new
+        last_step_action = action
 
         # finish one rollout
         if terminal or step == steps_per_epoch - 1:
