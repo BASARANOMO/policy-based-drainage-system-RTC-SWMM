@@ -19,11 +19,11 @@ class PolicyGradientAgent:
         if policy:
             self.policy = policy
         else:
-            self.policy = self.build_policy()
+            self.policy = self.build_default_policy()
         self.policy_lr = policy_lr
         self.optimizer = optimizer(learning_rate=self.policy_lr)
 
-    def build_policy(self, list_hidden_sizes=[64, 64], activation=tf.tanh):
+    def build_default_policy(self, list_hidden_sizes=[64, 64, 32], activation=tf.relu):
         observation_input = keras.Input(
             shape=(self.observation_dimensions,), dtype=tf.float32
         )
@@ -33,6 +33,9 @@ class PolicyGradientAgent:
         logits = layers.Dense(units=self.action_dimensions, activation=None)(x)
         policy = keras.Model(inputs=observation_input, outputs=logits)
         return policy
+
+    def save_policy_weights(self, path):
+        self.policy.save_weights(path)
 
     def logprobabilities(self, logits, a):
         # Compute the log-probabilities of taking actions a by using the logits (i.e. the output of the actor)

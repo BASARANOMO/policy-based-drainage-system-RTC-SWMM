@@ -10,16 +10,16 @@ class Buffer:
         self.action_buffer = np.zeros(buffer_size, dtype=np.int32)
         self.reward_buffer = np.zeros(buffer_size, dtype=np.float32)
         self.return_buffer = np.zeros(buffer_size, dtype=np.float32)
-        self.logprobability_buffer = np.zeros(buffer_size, dtype=np.float32)
+        #self.logprobability_buffer = np.zeros(buffer_size, dtype=np.float32)
         self.gamma = gamma
         self.pointer, self.trajectory_start_index = 0, 0
 
-    def store(self, observation, action, reward, logprobability):
+    def store(self, observation, action, reward):
         # Append one step of agent-environment interaction
         self.observation_buffer[self.pointer] = observation
         self.action_buffer[self.pointer] = action
         self.reward_buffer[self.pointer] = reward
-        self.logprobability_buffer[self.pointer] = logprobability
+        #self.logprobability_buffer[self.pointer] = logprobability
         self.pointer += 1
 
     def finish_trajectory(self, last_value=0):
@@ -40,5 +40,5 @@ class Buffer:
             self.observation_buffer,
             self.action_buffer,
             self.return_buffer,
-            self.logprobability_buffer,
+            #self.logprobability_buffer,
         )
