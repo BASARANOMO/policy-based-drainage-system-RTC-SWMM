@@ -43,15 +43,15 @@ save_model_freq = 2000
 
 # reward function def
 target_depths = [3.4, 4.7]
-low_target_depths = [1.5, 1.5]
+low_target_depths = [1.5, 2]
 depth_penalty = [-30, -100]
 if low_depth_penalty:
-    low_depth_penalty = [30, 100]
+    low_depth_penalty = [300, 1000]
 else:
     low_depth_penalty = [0, 0]
 depth_advantage = [0, 0]
-energy_coeff = [-150]
-safety_coeff = [-80]
+energy_coeff = [-1000]
+safety_coeff = [-500]
 k_coeff1 = [0.4, 0.3, 0.3]
 k_coeff2 = [0.2, 0.4, 0.4]
 #k_coeff2 = [x / 3 for x in k_coeff2]
