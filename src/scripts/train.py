@@ -19,8 +19,8 @@ nowtime = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M")
 epoch_cnt = int(sys.argv[2])
 first_rain_event_num = int(sys.argv[3])  # 1
 final_rain_event_num = int(sys.argv[4])  # 5
-low_depth_penalty = eval(sys.argv[5])
-result_folder_name = f"{sys.argv[1]}_{nowtime}_rain_{first_rain_event_num}_{final_rain_event_num}_episode_{epoch_cnt}_low_depth_penalty_{low_depth_penalty}"
+low_depth_penalty_flag = eval(sys.argv[5])
+result_folder_name = f"{sys.argv[1]}_{nowtime}_rain_{first_rain_event_num}_{final_rain_event_num}_episode_{epoch_cnt}_low_depth_penalty_{low_depth_penalty_flag}"
 
 training_cases_path = r"../../data/"
 training_cases_name = r"rain_case"
@@ -45,7 +45,7 @@ save_model_freq = 2000
 target_depths = [3.4, 4.7]
 low_target_depths = [1.5, 2]
 depth_penalty = [-30, -100]
-if low_depth_penalty:
+if low_depth_penalty_flag:
     low_depth_penalty = [300, 1000]
 else:
     low_depth_penalty = [0, 0]
