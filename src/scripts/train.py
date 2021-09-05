@@ -52,8 +52,8 @@ else:
 depth_advantage = [0, 0]
 energy_coeff = [-1000]
 safety_coeff = [-500]
-k_coeff1 = [0.4, 0.3, 0.3]
-k_coeff2 = [0.2, 0.4, 0.4]
+k_coeff1 = [0.4, 0.4, 0.2]
+k_coeff2 = [0.15, 0.7, 0.15]
 #k_coeff2 = [x / 3 for x in k_coeff2]
 
 # SWMM params
