@@ -4,6 +4,26 @@ import numpy as np
 def sigmoid(x):
     return 1 / (1 + np.exp(-x))
 
+def reward_depth_energy(depth_controlled_nodes, num_pumps_opened_nodes, **kwargs):
+    high_target_depths = kwargs.get("high_target_depths", [3.4, 4.7])
+    high_depth_penalty = kwargs.get("high_depth_penalty", [-1.0 for i in range(depth_controlled_nodes)])
+    low_target_depths = kwargs.get("low_target_depths", [2.0 for i in range(len(depth_controlled_nodes))])
+    low_depth_penalty = kwargs.get("low_depth_penalty", [-10.0 for i in range(depth_controlled_nodes)])
+    safety_depths = kwargs.get("safety_depths", [1.0 for i in range(len(depth_controlled_nodes))])
+    safety_depth_penalty = kwargs.get("safety_depth_penalty", [-100 for i in range(len(reward_depth_energy))])
+    energy_coeff = kwargs.get("energy_coeff", -10.0)
+    reward_depth = 0
+    reward_energy = 0
+    for i in range(len(depth_controlled_nodes)):
+        depth_diff_high = max(0, depth_controlled_nodes[i] - high_target_depths[i])
+        depth_diff_low = max(0, low_target_depths[i] - depth_controlled_nodes[i])
+        depth_diff_safety = max(0, safety_depths[i] - safety_depth_penalty[i])
+        reward_depth += high_depth_penalty[i] * depth_diff_high
+        reward_depth += low_depth_penalty[i] * depth_diff_low
+        reward_energy += num_pumps_opened_nodes[i] * energy_coeff
+    return reward_depth + reward_energy, reward_depth, reward_energy
+
+
 
 def reward_basic(depth_controlled_nodes, **kwargs):
     target_depths = kwargs.get(
