@@ -16,14 +16,14 @@ from utils.rewards import reward_3obj_lowdepthpenalty as reward_function
 
 # Model
 model_path = (
-    f"../../results/training/test_pg_433244_2021-09-04-22-47_rain_1_5_episode_3000_low_depth_penalty_True/"
+    f"../../results/training/test_pg_complex_reward_bis_2021-09-05-10-14_rain_1_5_episode_3000_low_depth_penalty_True/"
     + "trained_models/ckpt/node_ChengXi_policy_final.h5"
 )
 
 # Pathes
 nowtime = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M")
 low_depth_penalty = eval(sys.argv[3])
-result_folder_name = f"{sys.argv[2]}_low_depth_penalty_433244_{low_depth_penalty}"
+result_folder_name = f"{sys.argv[2]}_low_depth_penalty_complex_reward_bis_{low_depth_penalty}"
 
 training_cases_path = r"../../data/"
 training_cases_name = r"rain_case"
